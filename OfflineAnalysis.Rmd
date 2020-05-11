@@ -2,10 +2,10 @@
 title: "OfflineAnalysis"
 author: "Mahyar Nakhaei"
 date: "10/05/2020"
-output: html_document
+output: rmarkdown::github_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=TRUE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -27,7 +27,6 @@ library(nnet)
 #This is the required library for multinom logistic regression.
 ```{r}
 dataset<-read.table("MasterDataSet.txt",header=T)
-attach(dataset)
 Exp<-subset(dataset,ItemType=="Exp")
 ExpFiltered<-subset(Exp,TotalRT<(mean(TotalRT)+2.5*sd(TotalRT))&TotalRT>(mean(TotalRT)-2.5*sd(TotalRT)))
 ```

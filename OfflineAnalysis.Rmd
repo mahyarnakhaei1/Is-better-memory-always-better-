@@ -1,0 +1,71 @@
+---
+title: "OfflineAnalysis"
+author: "Mahyar Nakhaei"
+date: "10/05/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Introduction
+
+This study investigates how the memory load on speakers, ambiguity of the contexts and their working memory capacity (WMC) influence their referent choice for English pronouns. To do so, stimuli contain 7 regions which are read in a self-paced reading method. Some stimuli are preceded by an image showing geometric shapes. After reading the whole sentence, participants are required to choose the best referent choice (subject antecedent, object antecedent or neither) as in (1) below. 
+(1) a. **Tom** / said hello / to / Mary / while / **he** / was crossing the street.
+    b. **Tom** / said hello / to / **Mark** / while / **he** / was crossing the street.
+    c. Tom / said hello / to / Mark / while / **?she** / was crossing the street.
+    Question: Who was crossing the street:
+    1- Tom
+    2- Mark/Mary
+    3- Neither
+The codes below explains how I ran multinomial logistic regression on dataset with Ambiguity, MemoryLoad and WMC of participants as independent variables and ReferentChoice as dependent variable.
+
+```{r}
+library(nnet)
+```
+#This is the required library for multinom logistic regression.
+```{r}
+dataset<-read.table("MasterDataSet.txt",header=T)
+attach(dataset)
+Exp<-subset(dataset,ItemType=="Exp")
+ExpFiltered<-subset(Exp,TotalRT<(mean(TotalRT)+2.5*sd(TotalRT))&TotalRT>(mean(TotalRT)-2.5*sd(TotalRT)))
+```
+###This last line filters out outliers
+```{r}
+test <- multinom(ReferentChoice ~ Ambiguity + MemoryLoad + WMC, data = ExpFiltered)
+z <- summary(test)$coefficients/summary(test)$standard.errors
+p <- (1 - pnorm(abs(z), 0, 1))*2
+p
+summary(test)
+```
+###These are the stages that we should go through for any multinom analysis. From now on, we go through modelling!
+First, we should include everything through:
+```{r}
+Model<- multinom(ReferentChoice ~ ., data = ExpFiltered)
+summary(Model)
+```
+###Now, we should get rid of all unwanted columns through:
+```{r}
+Model <- multinom(ReferentChoice ~ ., data = ExpFiltered[,-c(1,2,3,4,5,8,9,10,11,12,13,14,16,17,18,19,20,21,22,23,24,25)])
+```
+###Then, we do all stages discussed first. That is:
+```{r}
+z <- summary(Model)$coefficients/summary(Model)$standard.errors
+p <- (1 - pnorm(abs(z), 0, 1))*2
+p
+summary(Model)
+```
+###Now, we should remove columns which has no significant p-values above (In this case, MemoryLoad)
+```{r}
+Model <- multinom(ReferentChoice ~ .-MemoryLoad, data = ExpFiltered[,-c(1,2,3,4,5,8,9,10,11,12,13,14,16,17,18,19,20,21,22,23,24,25)])
+```
+###Now, we should repeat the same stages for this new model:
+```{r}
+z <- summary(Model)$coefficients/summary(Model)$standard.errors
+p <- (1 - pnorm(abs(z), 0, 1))*2
+p
+summary(Model)
+```
+###And now, the interpretation:
+

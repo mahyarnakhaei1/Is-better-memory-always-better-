@@ -74,5 +74,25 @@ summary(Model)
 ```
   
 ##**The interpretations:**  
+  
+  Looking at the table of summary shown above, we can conclude that:  
+  1) **The memory load** on speakers has **no significant effect** on their **referent choice**.  
+  2) When the sentence changes from Ambiguous to No Referent, the log odds (likelihood) of choosing **Object** as the referent compared to **neither** decreases by -4.0255 whereas the log odds of choosing **subject** compared to **neither** decreases by -3.8983.  
+In other words, when the sentence has **no referent**, participants prefer to select **neither** option significantly more than **subject** which is followed by **object** as stated in (2):  
+
+(2) Tom said hello to Mark while **?she** was crossing the street. 
+    
+    Question: Who was crossing the street?    
+    1- Tom  
+    2- Mark  
+    3- Neither
+    
+    **Prediction:** Neither > Tom > Mary  
+  
+In addition, the summary shows that when the sentence changes from **Ambiguous** to **One Referent**, no significant effect is observed in participants' referent choice. In other words, they are more tolerant of ambiguous sentences compared to no referent sentences.  
+  
+Finally and surprisingly, a one-unit increase in WMC scores almost equally decreases the log odds of selecting subject or object antecedents compared to neither which means that participants with higher working memory prefer to select neither options signicantly more!!!  
+
+    
 
 

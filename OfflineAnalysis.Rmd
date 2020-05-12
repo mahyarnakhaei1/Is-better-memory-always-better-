@@ -2,7 +2,7 @@
 title: "OfflineAnalysis"
 author: "Mahyar Nakhaei"
 date: "10/05/2020"
-output: html_document
+output: rmarkdown::github_document
 
 ---
 

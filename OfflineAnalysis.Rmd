@@ -32,6 +32,8 @@ This is the required library for multinom logistic regression.
 dataset<-read.table("MasterDataSet.txt",header=T)
 Exp<-subset(dataset,ItemType=="Exp")
 ExpFiltered<-subset(Exp,TotalRT<(mean(TotalRT)+2.5*sd(TotalRT))&TotalRT>(mean(TotalRT)-2.5*sd(TotalRT)))
+ExpFiltered$Ambiguity<-as.factor(ExpFiltered$Ambiguity)
+ExpFiltered$Ambiguity<-relevel(ExpFiltered$Ambiguity, ref = "No")
 ```
 This last line filters out outliers
     
@@ -45,34 +47,96 @@ p
 summary(test)
 ```
     
-These are the stages that we should go through for any multinom analysis. From now on, we try to find out the best-fitting model!  
-First, we should include everything except unwanted columns through:  
-  
+These are the stages that we should go through for any multinom analysis.   
+Now, relevelling the factors:
 ```{r}
-Model <- multinom(ReferentChoice ~ ., data = ExpFiltered[,-c(1,2,3,4,5,8,9,10,11,12,13,14,16,17,18,19,20,21,22,23,24,25)])
-```
-Then, we do all stages discussed first. That is:  
-```{r}
-z <- summary(Model)$coefficients/summary(Model)$standard.errors
+ExpFiltered$Ambiguity<-relevel(ExpFiltered$Ambiguity, ref = "Amb")
+test <- multinom(ReferentChoice ~ Ambiguity + MemoryLoad + WMC, data = ExpFiltered)
+z <- summary(test)$coefficients/summary(test)$standard.errors
 p <- (1 - pnorm(abs(z), 0, 1))*2
 p
-summary(Model)
+summary(test)
 ```
-  
-Now, we should remove columns which has no significant p-values above (In this case, MemoryLoad)  
-  
+
 ```{r}
-Model <- multinom(ReferentChoice ~ .-MemoryLoad, data = ExpFiltered[,-c(1,2,3,4,5,8,9,10,11,12,13,14,16,17,18,19,20,21,22,23,24,25)])
-```
-  
-Now, we should repeat the same stages for this new model:    
-```{r}
-z <- summary(Model)$coefficients/summary(Model)$standard.errors
+ExpFiltered$Ambiguity<-relevel(ExpFiltered$Ambiguity, ref = "One")
+test <- multinom(ReferentChoice ~ Ambiguity + MemoryLoad + WMC, data = ExpFiltered)
+z <- summary(test)$coefficients/summary(test)$standard.errors
 p <- (1 - pnorm(abs(z), 0, 1))*2
 p
-summary(Model)
+summary(test)
+```  
+The following lines are done in order to find the exact percentage of referent choice in each condition:  
+```{r}
+AmbSub<-subset(ExpFiltered,Ambiguity=="Amb"&ReferentChoice=="Sub")
+AmbObj<-subset(ExpFiltered,Ambiguity=="Amb"&ReferentChoice=="Obj")
+AmbNeither<-subset(ExpFiltered,Ambiguity=="Amb"&ReferentChoice=="None")
+OneSub<-subset(ExpFiltered,Ambiguity=="One"&ReferentChoice=="Sub")
+OneObj<-subset(ExpFiltered,Ambiguity=="One"&ReferentChoice=="Obj")
+OneNeither<-subset(ExpFiltered,Ambiguity=="One"&ReferentChoice=="None")
+NoSub<-subset(ExpFiltered,Ambiguity=="No"&ReferentChoice=="Sub")
+NoObj<-subset(ExpFiltered,Ambiguity=="No"&ReferentChoice=="Obj")
+NoNeither<-subset(ExpFiltered,Ambiguity=="No"&ReferentChoice=="None")
+Amb<-subset(ExpFiltered,Ambiguity=="Amb")
+One<-subset(ExpFiltered,Ambiguity=="One")
+No<-subset(ExpFiltered,Ambiguity=="No")
+nrow(AmbSub)/nrow(Amb)
+nrow(AmbObj)/nrow(Amb)
+nrow(AmbNeither)/nrow(Amb)
+nrow(OneSub)/nrow(One)
+nrow(OneObj)/nrow(One)
+nrow(OneNeither)/nrow(One)
+nrow(NoSub)/nrow(No)
+nrow(NoObj)/nrow(No)
+nrow(NoNeither)/nrow(No)
 ```
-  
+The following lines are done in order to find the exact percentage of referent choice in each high or low memory load conditions:  
+```{r}
+AmbSub<-subset(ExpFiltered,Ambiguity=="Amb"&ReferentChoice=="Sub"&MemoryLoad=="High")
+AmbObj<-subset(ExpFiltered,Ambiguity=="Amb"&ReferentChoice=="Obj"&MemoryLoad=="High")
+AmbNeither<-subset(ExpFiltered,Ambiguity=="Amb"&ReferentChoice=="None"&MemoryLoad=="High")
+OneSub<-subset(ExpFiltered,Ambiguity=="One"&ReferentChoice=="Sub"&MemoryLoad=="High")
+OneObj<-subset(ExpFiltered,Ambiguity=="One"&ReferentChoice=="Obj"&MemoryLoad=="High")
+OneNeither<-subset(ExpFiltered,Ambiguity=="One"&ReferentChoice=="None"&MemoryLoad=="High")
+NoSub<-subset(ExpFiltered,Ambiguity=="No"&ReferentChoice=="Sub"&MemoryLoad=="High")
+NoObj<-subset(ExpFiltered,Ambiguity=="No"&ReferentChoice=="Obj"&MemoryLoad=="High")
+NoNeither<-subset(ExpFiltered,Ambiguity=="No"&ReferentChoice=="None"&MemoryLoad=="High")
+Amb<-subset(ExpFiltered,Ambiguity=="Amb"&MemoryLoad=="High")
+One<-subset(ExpFiltered,Ambiguity=="One"&MemoryLoad=="High")
+No<-subset(ExpFiltered,Ambiguity=="No"&MemoryLoad=="High")
+nrow(AmbSub)/nrow(Amb)
+nrow(AmbObj)/nrow(Amb)
+nrow(AmbNeither)/nrow(Amb)
+nrow(OneSub)/nrow(One)
+nrow(OneObj)/nrow(One)
+nrow(OneNeither)/nrow(One)
+nrow(NoSub)/nrow(No)
+nrow(NoObj)/nrow(No)
+nrow(NoNeither)/nrow(No)
+```
+```{r}
+AmbSub<-subset(ExpFiltered,Ambiguity=="Amb"&ReferentChoice=="Sub"&MemoryLoad=="Low")
+AmbObj<-subset(ExpFiltered,Ambiguity=="Amb"&ReferentChoice=="Obj"&MemoryLoad=="Low")
+AmbNeither<-subset(ExpFiltered,Ambiguity=="Amb"&ReferentChoice=="None"&MemoryLoad=="Low")
+OneSub<-subset(ExpFiltered,Ambiguity=="One"&ReferentChoice=="Sub"&MemoryLoad=="Low")
+OneObj<-subset(ExpFiltered,Ambiguity=="One"&ReferentChoice=="Obj"&MemoryLoad=="Low")
+OneNeither<-subset(ExpFiltered,Ambiguity=="One"&ReferentChoice=="None"&MemoryLoad=="Low")
+NoSub<-subset(ExpFiltered,Ambiguity=="No"&ReferentChoice=="Sub"&MemoryLoad=="Low")
+NoObj<-subset(ExpFiltered,Ambiguity=="No"&ReferentChoice=="Obj"&MemoryLoad=="Low")
+NoNeither<-subset(ExpFiltered,Ambiguity=="No"&ReferentChoice=="None"&MemoryLoad=="Low")
+Amb<-subset(ExpFiltered,Ambiguity=="Amb"&MemoryLoad=="Low")
+One<-subset(ExpFiltered,Ambiguity=="One"&MemoryLoad=="Low")
+No<-subset(ExpFiltered,Ambiguity=="No"&MemoryLoad=="Low")
+nrow(AmbSub)/nrow(Amb)
+nrow(AmbObj)/nrow(Amb)
+nrow(AmbNeither)/nrow(Amb)
+nrow(OneSub)/nrow(One)
+nrow(OneObj)/nrow(One)
+nrow(OneNeither)/nrow(One)
+nrow(NoSub)/nrow(No)
+nrow(NoObj)/nrow(No)
+nrow(NoNeither)/nrow(No)
+```
 ##**The interpretations:**  
   
   Looking at the table of summary shown above, we can conclude that:  
